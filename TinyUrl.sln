@@ -1,0 +1,28 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TinyUrl.DAL", "TinyUrl.DAL\TinyUrl.DAL.csproj", "{13FD9453-AFC5-425E-B2DF-6D2DA727F75B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TinyURl.MVC", "TinyURl.MVC\TinyURl.MVC.csproj", "{EBE9ED48-27A7-40D7-86E6-6E52658E5285}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TinyUrl.Logic", "TinyUrl.Logic\TinyUrl.Logic.csproj", "{30C4B3F6-726C-49B7-B191-B634E2A23B93}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{13FD9453-AFC5-425E-B2DF-6D2DA727F75B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{13FD9453-AFC5-425E-B2DF-6D2DA727F75B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{13FD9453-AFC5-425E-B2DF-6D2DA727F75B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{13FD9453-AFC5-425E-B2DF-6D2DA727F75B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EBE9ED48-27A7-40D7-86E6-6E52658E5285}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EBE9ED48-27A7-40D7-86E6-6E52658E5285}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EBE9ED48-27A7-40D7-86E6-6E52658E5285}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EBE9ED48-27A7-40D7-86E6-6E52658E5285}.Release|Any CPU.Build.0 = Release|Any CPU
+		{30C4B3F6-726C-49B7-B191-B634E2A23B93}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{30C4B3F6-726C-49B7-B191-B634E2A23B93}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{30C4B3F6-726C-49B7-B191-B634E2A23B93}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{30C4B3F6-726C-49B7-B191-B634E2A23B93}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal

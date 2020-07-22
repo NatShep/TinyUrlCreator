@@ -1,0 +1,24 @@
+@model string 
+
+<h5>Вы вошли как @User.Identity.Name</h5>
+<h2>Введите ссылку</h2>
+<form asp-action="CreateTinyUrl" asp-controller="TinyUrl" >
+    <div>
+        <div class="form-group">
+            <label>Введите ccылку для преобразования</label>
+            <input type="text" value=@ViewBag.UrlString Name="urlString"/>
+        </div>
+        <div class="form-group">
+            <input type="submit" value="Получить короткую ссылку" class="btn btn-outline-dark" />
+        </div>
+    </div>
+</form>
+
+@{
+    if (@ViewBag.UrlString != null)
+    {
+        <p>
+            @ViewBag.UrlString = <a href=@ViewBag.UrlString> @ViewBag.TinyUrl </a>
+        </p>
+    }
+}
