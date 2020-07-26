@@ -1,0 +1,12 @@
+@using TinyUrl.DAL.Models;
+@model Url
+<tr>
+    <td>
+        @Html.DisplayFor(model=>model.OriginalPath)
+    </td>
+    <td><a href=model.FullTinyPath> @Html.DisplayFor(model=>model.FullTinyPath)</a></td>
+    <td>@Html.DisplayFor(model=>model.NumberOfTransitions)</td>
+    <td>
+        <a href=@Model.FullTinyPath>Перейти по ссылке</a>
+    </td>
+</tr>

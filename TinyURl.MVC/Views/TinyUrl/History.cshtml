@@ -1,2 +1,24 @@
+@using TinyUrl.DAL.Models
+@model IEnumerable<Url>
+
 <h2>Тут история</h2>
-<p><a asp-action="Index" asp-controller="TinyUrl">Назад</a></p>
+<p><a asp-action="Index" asp-controller="TinyUrl">Вернуться назад</a></p>
+
+<table class="table">
+    <thead>
+    <tr>
+        <th>Полная ссылка</th>
+        <th>Короткая ссылка</th>
+    </tr>
+    </thead>
+    <tbody>
+    @foreach (var url in Model)
+    {
+        <tr>
+        <td>@Html.DisplayFor(model => url.OriginalPath)</td>
+            <td><a href=@url.FullTinyPath> @url.FullTinyPath </a></td>
+        </tr>
+    }
+    </tbody>
+</table>
+

@@ -1,8 +1,8 @@
 ﻿using Microsoft.EntityFrameworkCore.Migrations;
 
-namespace TinyUrl.EF.Migrations
+namespace TinyUrl.DAL.Migrations
 {
-    public partial class Init : Migration
+    public partial class init : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -48,11 +48,7 @@ namespace TinyUrl.EF.Migrations
                 table: "Urls",
                 column: "UserId");
 
-            migrationBuilder.CreateIndex(
-                name: "IX_Users_UserName",
-                table: "Users",
-                column: "UserName",
-                unique: true);
+   
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)

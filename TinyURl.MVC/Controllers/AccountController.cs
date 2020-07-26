@@ -16,14 +16,14 @@ namespace TinyURl.MVC.Controllers
 {
     public class AccountController : Controller
     {
-        private MakeTinyUrlService _tinyUrlService;
+        private readonly MakeTinyUrlService _tinyUrlService;
 
         public AccountController(MakeTinyUrlService tinyUrlService) => _tinyUrlService = tinyUrlService;
         
         [HttpGet]
         public async Task<IActionResult> LoginStranger()
         {
-            var model = new LoginModel{Name = "Stranger0000",Password = "0000"};
+            var model = new LoginModel{Name = "Anonimus",Password = "0000"};
             await Authenticate(model.Name);
             return View();
         }
@@ -37,12 +37,11 @@ namespace TinyURl.MVC.Controllers
         {
             if (ModelState.IsValid)
             {
-                User user = await _tinyUrlService
-                    .FindFirsUserOrNullByCondition(u => u.UserName == model.Name && u.Password == model.Password);
+                User user = await _tinyUrlService.FindUserOrNullAsyncByCondition
+                    (u => u.UserName == model.Name && u.Password == model.Password);
                 if (user != null)
                 {
                     await Authenticate(model.Name); 
- 
                     return RedirectToAction("Index", "TinyUrl");
                 }
                 ModelState.AddModelError("", "Некорректные логин и(или) пароль");
@@ -59,7 +58,7 @@ namespace TinyURl.MVC.Controllers
         {
             if (ModelState.IsValid)
             {
-                User user = await _tinyUrlService.FindFirsUserOrNullByCondition(u => u.UserName == model.Name);
+                User user = await _tinyUrlService.FindUserOrNullAsyncByCondition(u => u.UserName == model.Name);
                 if (user == null)
                 {
                     _tinyUrlService.AddUser(new User { UserName = model.Name, Password = model.Password });
@@ -74,8 +73,7 @@ namespace TinyURl.MVC.Controllers
         
         private async Task Authenticate(string userName)
         {
-            var claims = new List<Claim>
-            {
+            var claims = new List<Claim> {
                 new Claim(ClaimsIdentity.DefaultNameClaimType, userName)
             };
             ClaimsIdentity id = new ClaimsIdentity(claims, "ApplicationCookie", ClaimsIdentity.DefaultNameClaimType, ClaimsIdentity.DefaultRoleClaimType);

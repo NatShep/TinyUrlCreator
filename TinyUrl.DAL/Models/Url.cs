@@ -6,20 +6,23 @@ namespace TinyUrl.DAL.Models
 {
     public class Url:EntityBase
     {
-        
         [MaxLength(8), MinLength(8), Required] public string TinyPath { get; set; }
-        
-        public string NumberOfTransitions { get; set; }
+
+        public string NumberOfTransitions { get; set; } = "0";
         public string OriginalPath { get; set; }
+        
         public int UserId { get; set; } 
         [ForeignKey(nameof(UserId))]
-        public virtual User User { get; set; }
+        public User User { get; set; }
+        
+        [NotMapped]
+        public string FullTinyPath => "https://localhost:5001/TinyUrl/"+ TinyPath;
 
-  /*      public void IncreaseNumberOfTransitions()
+        /*   public void IncreaseNumberOfTransitions()
         {
             //dump
         }
-    */   
-        
+       */
+
     }
 }

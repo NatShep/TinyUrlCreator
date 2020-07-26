@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Security.Claims;
 using System.Threading.Tasks;
 using TinyUrl.DAL.Models;
 using TinyUrl.DAL.Repo;
@@ -19,33 +20,45 @@ namespace TinyUrl.Logic.Services
             _userRepo = userRepo;
         }
 
-        public int AddUser(User user)
-        {
-            return _userRepo.Add(user);
-        }
+        public void AddUser(User user) => _userRepo.AddUser(user);
 
-        public int AddUrl(Url url)
-        {
-            return _urlRepo.Add(url);
-        }
+        public void AddUrl(Url url) => _urlRepo.AddUrl(url);
+
+        public User FindUser(int id) => _userRepo.GetOne(id);
+
+        public Url FindUrl(int id) => _urlRepo.GetOne(id);
+
+        public List<Url> FindUrlsByUser(int userId) => _urlRepo.FindUrlsByUser(userId);
         
-        public User FindUser(int id)
-        {
-            return _userRepo.GetOne(id);
-        }
-
-        public Url FindUrl(int id)
-        {
-            return _urlRepo.GetOne(id);
-        }
-
-        public Task<User> FindFirsUserOrNullByCondition(Expression<Func<User, bool>> where)
-        {
-            return _userRepo.GetFirstOrDefaultAwait(where);
-        }
-       
-
+        public Url FindFirsUrlOrNullByCondition(Expression<Func<Url, bool>> where) =>
+            _urlRepo.FindFirstOrDefault(where);
         
+
+        public List<Url> FindSomeUrlsByCondition(Expression<Func<Url, bool>> where) => _urlRepo.GetSome(where);
+
+        public User FindUserOrNullByCondition(Expression<Func<User, bool>> where) =>
+            _userRepo.GetFirstOrDefault(where);
+        
+        public async Task<User> FindUserOrNullAsyncByCondition(Expression<Func<User, bool>> where) =>
+            await _userRepo.GetFirstOrDefaultAsync(where);
+
+
+        public Url FindUrlAndIncreaseNumberOfTransitionByOne(Url url)=> 
+            _urlRepo.UpdateAndReturnUrl(u=> u.NumberOfTransitions = u.NumberOfTransitions+"+1", url);
+        
+        public string CreateTinyUrlForUser(User user, string url)
+        {
+            var tinyUrl = TinyCreator.CreateTinyUrl(url);
+
+            var allUrlsForUser = FindUrlsByUser(user.Id);
+
+            while (allUrlsForUser.Any(u => u.User.Id == user.Id && u.TinyPath == tinyUrl))
+                tinyUrl = TinyCreator.CreateTinyUrl(url);
+
+            return tinyUrl;
+        }
+
+        public void UpdateHistoryForUser(string tinyPath, User user) => _userRepo.UpdateHistory(user, tinyPath);
         
     }
 }

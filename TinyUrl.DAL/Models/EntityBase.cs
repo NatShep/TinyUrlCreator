@@ -4,6 +4,7 @@ namespace TinyUrl.DAL.Models
 {
     public class EntityBase
     {
-        [Key] public int Id { set; get; }
+        [Key] 
+        public int Id { get; set; }
     }
 }

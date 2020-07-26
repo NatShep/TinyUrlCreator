@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 
 namespace TinyUrl.DAL.Models
@@ -12,15 +13,13 @@ namespace TinyUrl.DAL.Models
         [StringLength(20), Required]
         public string Password { get; set; }
 
-        public string HistoryString { get; set; }
+        public string HistoryString { get; set; } = "";
+        
         public List<Url> TinyUrls { get; set; } = new List<Url>();
 
-   //     [NotMapped] public int[] History => GetHistory(HistoryString);
+        [NotMapped] public string[] History => GetHistory(HistoryString);
 
-   /*     private int[] GetHistory(string history)
-        {
-            //plug
-            return new int[0];
-        }*/
+        private string[] GetHistory(string historyString)=>
+             historyString.Split(',');
     }
 }

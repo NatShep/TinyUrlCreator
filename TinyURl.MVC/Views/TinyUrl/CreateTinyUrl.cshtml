@@ -1,24 +1,35 @@
-@model string 
+@model TinyURl.MVC.Models.ViewModels.UrlModel
+
+@Html.ValidationSummary(false,"",new {@class="text-danger"})
 
 <h5>Вы вошли как @User.Identity.Name</h5>
 <h2>Введите ссылку</h2>
-<form asp-action="CreateTinyUrl" asp-controller="TinyUrl" >
-    <div>
-        <div class="form-group">
-            <label>Введите ccылку для преобразования</label>
-            <input type="text" value=@ViewBag.UrlString Name="urlString"/>
-        </div>
-        <div class="form-group">
-            <input type="submit" value="Получить короткую ссылку" class="btn btn-outline-dark" />
-        </div>
-    </div>
+<form asp-action="CreateTinyUrl" asp-controller="TinyUrl" asp-anti-forgery="true">
+       <div class="validation" asp-validation-summary="ModelOnly" />
+       <div>
+            <div class="form-group">
+                       <label asp-for="OriginalUrl">Введите ccылку для преобразования</label>
+                       <input type="text"   asp-for="OriginalUrl" />
+                       <span asp-validation-for="OriginalUrl" />
+                   </div>
+           <div class="form-group">
+               <input type="hidden" asp-for="TinyPath"/>
+               <input type="hidden" asp-for="UrlExist"/>
+           </div>
+           <div class="form-group">
+               <input type="submit" value="Получить короткую ссылку" class="btn btn-outline-dark"/>
+           </div>
+       </div>
 </form>
 
 @{
-    if (@ViewBag.UrlString != null)
+    if (@Model.UrlExist)
     {
         <p>
-            @ViewBag.UrlString = <a href=@ViewBag.UrlString> @ViewBag.TinyUrl </a>
+            @Model.OriginalUrl = <a href=@Model.FullTinyUrl> @Model.FullTinyUrl </a>
         </p>
     }
 }
+
+<p><a asp-action="Index" asp-controller="TinyUrl">Назад</a></p>
+
