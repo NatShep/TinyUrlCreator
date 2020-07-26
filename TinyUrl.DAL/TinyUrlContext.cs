@@ -40,12 +40,6 @@ namespace TinyUrl.DAL
                 entity.HasIndex(e => new {e.TinyPath}).IsUnique();
             });
             
-        /*    modelBuilder.Entity<DAL.Models.Url>()
-                .HasOne(e => e.User)
-                .WithMany(e => e.TinyUrls)
-                .HasForeignKey(pt => pt.UserId)
-                .OnDelete(DeleteBehavior.Cascade);
-*/
         }
         
         

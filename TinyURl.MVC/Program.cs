@@ -23,7 +23,7 @@ namespace TinyURl.MVC
             {
                 var services = scope.ServiceProvider;
                 var context = services.GetRequiredService<TinyUrlContext>();
-        //     DataInitializer.RecreateDatabase(context);
+     //       DataInitializer.RecreateDatabase(context);
                 //        MyDataInitializer.InitializeData(context);
             }
             webHost.Run();

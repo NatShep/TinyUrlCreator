@@ -1,27 +1,36 @@
 @using TinyUrl.DAL.Models
 @model IEnumerable<Url>
 
+<h5>Вы вошли как @User.Identity.Name</h5>
 
 <h2>Тут все ссылки</h2>
 <p><a asp-action="Index" asp-controller="TinyUrl">Вернуться назад</a></p>
 
-<table class="table">
-    <thead>
-    <tr>
-        <th>Полная ссылка</th>
-        <th>Короткая ссылка</th>
-        <th>Количество переходов</th>
-    </tr>
-    </thead>
-    
-    <tbody>
-    @foreach (var url in Model)
+
+@if (@User.Identity.Name == "Anonymous")
+{
+    <h3> В этой версии функционал не поддерживается </h3>
+}
+else
+{
+    <table class="table">
+        <thead>
+        <tr>
+            <th>Полная ссылка</th>
+            <th>Короткая ссылка</th>
+            <th>Количество переходов</th>
+        </tr>
+        </thead>
+
+        <tbody>
+        @foreach (var url in Model)
         {
             <tr>
-                <td>@Html.DisplayFor(model=>url.OriginalPath)</td>
+                <td>@Html.DisplayFor(model => url.OriginalPath)</td>
                 <td><a href=@url.FullTinyPath> @url.FullTinyPath</a></td>
-                <td>@Html.DisplayFor(model=>url.NumberOfTransitions)</td>
+                <td>@Html.DisplayFor(model => url.NumberOfTransitions)</td>
             </tr>
         }
-    </tbody>
-</table>
+        </tbody>
+    </table>
+}

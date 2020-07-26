@@ -23,7 +23,7 @@ namespace TinyURl.MVC.Controllers
         [HttpGet]
         public async Task<IActionResult> LoginStranger()
         {
-            var model = new LoginModel{Name = "Anonimus",Password = "0000"};
+            var model = new LoginModel{Name = "Anonymous",Password = ""};
             await Authenticate(model.Name);
             return View();
         }

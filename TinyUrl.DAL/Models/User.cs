@@ -5,21 +5,25 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace TinyUrl.DAL.Models
 {
-    public class User:EntityBase
+    public class User : EntityBase
     {
         [StringLength(20, ErrorMessage = "User Name must be 20 characters or less"), Required]
         public string UserName { get; set; }
 
-        [StringLength(20), Required]
-        public string Password { get; set; }
+        [StringLength(20), Required] public string Password { get; set; }
 
-        public string HistoryString { get; set; } = "";
-        
+        public string? HistoryString { get; set; } = null;
+
         public List<Url> TinyUrls { get; set; } = new List<Url>();
 
         [NotMapped] public string[] History => GetHistory(HistoryString);
 
-        private string[] GetHistory(string historyString)=>
-             historyString.Split(',');
+        private string[] GetHistory(string? historyString)
+        {
+            if (historyString != null)
+                return historyString.Split(',');
+            else
+                return new string[0];
+        }
     }
 }

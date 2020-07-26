@@ -4,6 +4,8 @@ using System.Linq;
 using System.Net;
 using System.Security.Claims;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using TinyUrl.DAL.Models;
@@ -41,6 +43,13 @@ namespace TinyURl.MVC.Controllers
             if (ping.Result)
             {
                 var user = GetUser(User.Identity.Name);
+                if (User.Identity.Name == "Anonimus")
+                {
+                    url.TinyPath = _tinyUrlService.CreateTinyUrlForUser(user, url.OriginalUrl);
+                    url.UrlExist = true;
+                    return View(url);
+                }
+
                 var existingUrl =
                     _tinyUrlService.FindFirsUrlOrNullByCondition(u =>
                         u.OriginalPath == url.OriginalUrl && u.User == user);
@@ -58,21 +67,18 @@ namespace TinyURl.MVC.Controllers
                 url.TinyPath = _tinyUrlService.CreateTinyUrlForUser(user, url.OriginalUrl);
                 url.UrlExist = true;
 
-                var uRl = new Url
+                _tinyUrlService.AddUrl(new Url
                 {
                     OriginalPath = url.OriginalUrl,
                     TinyPath = url.TinyPath,
                     User = user,
-                };
-                _tinyUrlService.AddUrl(uRl);
+                });
             }
             else
             {
                 url.UrlExist = false;
                 ModelState.AddModelError("", "Вы ввели не рабочую ссылку");
-
             }
-
             return View(url);
         }
 
@@ -110,6 +116,7 @@ namespace TinyURl.MVC.Controllers
         [HttpGet]
         public IActionResult GoToTinyUrl(string tinyPath)
         {
+            
             //find tiny url with this tinyPath (tinyPath is unique)
             var url = _tinyUrlService.FindFirsUrlOrNullByCondition(u => u.TinyPath == tinyPath);
             if (url == null)
@@ -132,8 +139,17 @@ namespace TinyURl.MVC.Controllers
 
         private User GetUser(string name)
         {
-            return _tinyUrlService.FindUserOrNullByCondition(u =>
+            var user = _tinyUrlService.FindUserOrNullByCondition(u =>
                 u.UserName == name);
+            if (user == null)
+                return new User
+                {
+                    UserName = "Анонимный пользователь"
+                };
+            return user;
         }
+        
+        
+
     }
 }

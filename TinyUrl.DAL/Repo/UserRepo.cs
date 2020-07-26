@@ -36,15 +36,7 @@ namespace TinyUrl.DAL.Repo
         public List<User> GetSome(Expression<Func<User, bool>> where) => _db.Users.Where(where).ToList();
 
 
-        public void UpdateHistory(User user, string urlTinyPath)
-        {
-            if (user.HistoryString!="")
-                user.HistoryString = user.HistoryString + "," + urlTinyPath;
-            else 
-                user.HistoryString = urlTinyPath;
-            
-            SaveChanges();
-        }
+        public void UpdateHistory(User user) => SaveChanges();
         
         private int SaveChanges()
         {

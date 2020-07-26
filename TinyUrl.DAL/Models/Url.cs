@@ -8,7 +8,9 @@ namespace TinyUrl.DAL.Models
     {
         [MaxLength(8), MinLength(8), Required] public string TinyPath { get; set; }
 
-        public string NumberOfTransitions { get; set; } = "0";
+ //       public string NumberOfTransitions { get; private set; } = "0";
+
+        public ulong NumberOfTransitions { get; set; } = 0;
         public string OriginalPath { get; set; }
         
         public int UserId { get; set; } 
@@ -18,11 +20,10 @@ namespace TinyUrl.DAL.Models
         [NotMapped]
         public string FullTinyPath => "https://localhost:5001/TinyUrl/"+ TinyPath;
 
-        /*   public void IncreaseNumberOfTransitions()
+        public void IncreaseNumberOfTransitions()
         {
-            //dump
+            NumberOfTransitions++;
         }
-       */
 
     }
 }

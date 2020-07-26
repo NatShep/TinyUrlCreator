@@ -44,7 +44,7 @@ namespace TinyUrl.Logic.Services
 
 
         public Url FindUrlAndIncreaseNumberOfTransitionByOne(Url url)=> 
-            _urlRepo.UpdateAndReturnUrl(u=> u.NumberOfTransitions = u.NumberOfTransitions+"+1", url);
+            _urlRepo.UpdateAndReturnUrl(u=> u.IncreaseNumberOfTransitions(), url);
         
         public string CreateTinyUrlForUser(User user, string url)
         {
@@ -56,7 +56,14 @@ namespace TinyUrl.Logic.Services
             return tinyUrl;
         }
 
-        public void UpdateHistoryForUser(string tinyPath, User user) => _userRepo.UpdateHistory(user, tinyPath);
+        public void UpdateHistoryForUser(string tinyPath, User user)
+        {
+            if (user.HistoryString!=null)
+                user.HistoryString = user.HistoryString + "," + tinyPath;
+            else 
+                user.HistoryString = tinyPath;
+            _userRepo.UpdateHistory(user);
+        }
 
         public User GetUserByUrl(int urlId)
         {
