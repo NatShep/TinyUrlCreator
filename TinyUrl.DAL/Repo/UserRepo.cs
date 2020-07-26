@@ -12,7 +12,6 @@ namespace TinyUrl.DAL.Repo
     public class UserRepo
     {
         private readonly TinyUrlContext _db;
-        protected TinyUrlContext ContextDb => _db;
 
         public UserRepo() : this(new TinyUrlContext())
         {  }

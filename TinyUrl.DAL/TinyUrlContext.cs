@@ -35,6 +35,10 @@ namespace TinyUrl.DAL
                 entity.HasIndex(e => new {e.UserName}).IsUnique();
             });
 
+            modelBuilder.Entity<Url>(entity =>
+            {
+                entity.HasIndex(e => new {e.TinyPath}).IsUnique();
+            });
             
         /*    modelBuilder.Entity<DAL.Models.Url>()
                 .HasOne(e => e.User)
