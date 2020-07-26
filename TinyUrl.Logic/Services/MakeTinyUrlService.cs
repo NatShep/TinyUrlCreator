@@ -49,10 +49,8 @@ namespace TinyUrl.Logic.Services
         public string CreateTinyUrlForUser(User user, string url)
         {
             var tinyUrl = TinyCreator.CreateTinyUrl(url);
-
-            var allUrlsForUser = FindUrlsByUser(user.Id);
-
-            while (allUrlsForUser.Any(u => u.User.Id == user.Id && u.TinyPath == tinyUrl))
+            var allUrls = _urlRepo.GetAllTinyPaths();
+            while (allUrls.Any(u=> u == tinyUrl))
                 tinyUrl = TinyCreator.CreateTinyUrl(url);
 
             return tinyUrl;

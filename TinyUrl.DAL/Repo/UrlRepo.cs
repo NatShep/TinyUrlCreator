@@ -68,7 +68,14 @@ namespace TinyUrl.DAL.Repo
                 throw;
             }
         }
+        public List<Url> GetAll()
+        {
+           return _db.Urls.ToList();
+        }
 
-    
+        public List<string> GetAllTinyPaths()
+        {
+            return _db.Urls.Select(u=>u.TinyPath).ToList();
+        }
     }
 }
