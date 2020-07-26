@@ -41,12 +41,18 @@ namespace TinyURl.MVC.Controllers
             if (ping.Result)
             {
                 var user = GetUser(User.Identity.Name);
-
-                if (_tinyUrlService.FindSomeUrlsByCondition
-                    (u => u.OriginalPath == url.OriginalUrl && u.User == user).FirstOrDefault() != null)
+                var existingUrl =
+                    _tinyUrlService.FindFirsUrlOrNullByCondition(u =>
+                        u.OriginalPath == url.OriginalUrl && u.User == user);
+                if (existingUrl != null)
                 {
                     ModelState.AddModelError("", "Эта ссылка уже добавлена");
-                    return View(url);
+                    return View(new UrlModel
+                    {
+                        OriginalUrl = existingUrl.OriginalPath,
+                        TinyPath = existingUrl.TinyPath,
+                        UrlExist = true
+                    });
                 }
 
                 url.TinyPath = _tinyUrlService.CreateTinyUrlForUser(user, url.OriginalUrl);
@@ -55,13 +61,17 @@ namespace TinyURl.MVC.Controllers
                 var uRl = new Url
                 {
                     OriginalPath = url.OriginalUrl,
-                    TinyPath = url.TinyPath, 
-                    User=user,
-                }; 
+                    TinyPath = url.TinyPath,
+                    User = user,
+                };
                 _tinyUrlService.AddUrl(uRl);
             }
             else
+            {
                 url.UrlExist = false;
+                ModelState.AddModelError("", "Вы ввели не рабочую ссылку");
+
+            }
 
             return View(url);
         }
@@ -72,7 +82,7 @@ namespace TinyURl.MVC.Controllers
         {
             var user = GetUser(User.Identity.Name);
             var userHistory = user.History;
-            var historyList=new List<Url>();
+            var historyList = new List<Url>();
             foreach (var tinyUrl in userHistory)
             {
                 var url = _tinyUrlService.FindFirsUrlOrNullByCondition(u => u.TinyPath == tinyUrl);
@@ -80,8 +90,10 @@ namespace TinyURl.MVC.Controllers
                 {
                     throw new Exception("Find null links in userHistory");
                 }
+
                 historyList.Add(url);
             }
+
             return View(historyList);
         }
 
@@ -96,13 +108,25 @@ namespace TinyURl.MVC.Controllers
 
         [Route("TinyUrl/{tinyPath}")]
         [HttpGet]
-        [Authorize]
         public IActionResult GoToTinyUrl(string tinyPath)
         {
+            //find tiny url with this tinyPath (tinyPath is unique)
             var url = _tinyUrlService.FindFirsUrlOrNullByCondition(u => u.TinyPath == tinyPath);
-            var user = GetUser(User.Identity.Name);
+            if (url == null)
+            {
+                ModelState.AddModelError("", "Переход по несуществующей ссылке.");
+                return View();
+            }
+            
+            //find the User(holder) of this tiny url
+            var user = _tinyUrlService.GetUserByUrl(url.Id);
+            
+            //increase number of transition and history, if User or someone else use this tiny url
+            //??   maybe better to update history when user(not everybody) go to url  ??
+            // TODO add info(for example time) of transition
             var tinyUrl = _tinyUrlService.FindUrlAndIncreaseNumberOfTransitionByOne(url);
             _tinyUrlService.UpdateHistoryForUser(url.TinyPath, user);
+
             return new RedirectResult(tinyUrl.OriginalPath);
         }
 

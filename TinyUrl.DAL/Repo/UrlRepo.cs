@@ -77,5 +77,10 @@ namespace TinyUrl.DAL.Repo
         {
             return _db.Urls.Select(u=>u.TinyPath).ToList();
         }
+
+        public User GetUserByUrl(int urlId)
+        {
+            return _db.Urls.Include(u => u.User).Where(u => u.Id == urlId).Select(u=>u.User).FirstOrDefault();
+        }
     }
 }

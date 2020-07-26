@@ -57,6 +57,10 @@ namespace TinyUrl.Logic.Services
         }
 
         public void UpdateHistoryForUser(string tinyPath, User user) => _userRepo.UpdateHistory(user, tinyPath);
-        
+
+        public User GetUserByUrl(int urlId)
+        {
+            return _urlRepo.GetUserByUrl(urlId);
+        }
     }
 }

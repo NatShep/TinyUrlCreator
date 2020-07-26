@@ -1,0 +1,11 @@
+
+
+@Html.ValidationSummary(false,"",new {@class="text-danger"})
+
+<p><a asp-action="Index" asp-controller="TinyUrl">Вернуться назад</a></p>
+
+
+@section Scripts
+{
+    @{ await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

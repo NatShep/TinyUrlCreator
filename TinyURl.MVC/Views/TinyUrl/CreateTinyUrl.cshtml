@@ -33,3 +33,10 @@
 
 <p><a asp-action="Index" asp-controller="TinyUrl">Назад</a></p>
 
+
+@section Scripts
+{
+    @{ await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}
+
+
