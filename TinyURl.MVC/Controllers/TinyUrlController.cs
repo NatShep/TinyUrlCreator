@@ -38,8 +38,13 @@ namespace TinyURl.MVC.Controllers
             {
                 var user = await GetUserAsync(User.Identity.Name);
                 //check user
-                if (User.Identity.Name == "Anonimus")
+                if (User.Identity.Name == "Anonymous")
                     return View(url);
+                if (user.UserName == "Anonymous")
+                {
+                    ModelState.AddModelError("", "Для дальнейшей работы необходимо зарегистироваться");
+                    return View(url);
+                }
                 
                 //check url. Is it Exist?
                 var existingUrl = await _tinyUrlService.FindUrlOrNullByConditionAsync(u =>

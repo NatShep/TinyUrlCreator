@@ -3,15 +3,18 @@
 @Html.ValidationSummary(false,"",new {@class="text-danger"})
 
 <h5>Вы вошли как @User.Identity.Name</h5>
+    <p><a asp-action="Index" asp-controller="TinyUrl">Вернуться назад</a></p>
+
 
 @if (@User.Identity.Name == "Anonymous")
 {
+    
     <h3> В этой версии функционал не поддерживается </h3>
 }
+
 else
 {
     <h2>Введите ссылку</h2>
-    <p><a asp-action="Index" asp-controller="TinyUrl">Вернуться назад</a></p>
 
     <form asp-action="CreateTinyUrl" asp-controller="TinyUrl" asp-anti-forgery="true">
         <div class="validation" asp-validation-summary="ModelOnly"/>
