@@ -20,54 +20,65 @@ namespace TinyUrl.Logic.Services
             _userRepo = userRepo;
         }
 
-        public void AddUser(User user) => _userRepo.AddUser(user);
+        public async Task AddUserAsync(User user) => await _userRepo.AddAsync(user);
 
-        public void AddUrl(Url url) => _urlRepo.AddUrl(url);
+        public async Task AddUrlAsync(Url url) =>await _urlRepo.AddAsync(url);
 
-        public User FindUser(int id) => _userRepo.GetOne(id);
+        public async Task<List<Url>> FindUrlsByUserAsync(int userId) => await _urlRepo.FindUrlsByUserAsync(userId);
 
-        public Url FindUrl(int id) => _urlRepo.GetOne(id);
+        public Url FindUrlOrNullByCondition(Expression<Func<Url, bool>> where) =>
+            _urlRepo.GetFirstOrDefault(where);
 
-        public List<Url> FindUrlsByUser(int userId) => _urlRepo.FindUrlsByUser(userId);
-        
-        public Url FindFirsUrlOrNullByCondition(Expression<Func<Url, bool>> where) =>
-            _urlRepo.FindFirstOrDefault(where);
-        
+        public async Task<Url> FindUrlOrNullByConditionAsync(Expression<Func<Url, bool>> where) =>
+           await _urlRepo.GetFirstOrDefaultAsync(where);
 
         public List<Url> FindSomeUrlsByCondition(Expression<Func<Url, bool>> where) => _urlRepo.GetSome(where);
 
+        public async Task<List<Url>> FindSomeUrlsByConditionAsync(Expression<Func<Url, bool>> where) => 
+            await _urlRepo.GetSomeAsync(where);
+
         public User FindUserOrNullByCondition(Expression<Func<User, bool>> where) =>
             _userRepo.GetFirstOrDefault(where);
-        
-        public async Task<User> FindUserOrNullAsyncByCondition(Expression<Func<User, bool>> where) =>
+
+        public async Task<User> FindUserOrNullByConditionAsync(Expression<Func<User, bool>> where) =>
             await _userRepo.GetFirstOrDefaultAsync(where);
 
+        public async Task<Url> IncreaseNumberOfTransitionByOneAsync(Url url) =>
+            await _urlRepo.UpdateAndReturnUrlAsync(u => u.IncreaseNumberOfTransitions(), url);
 
-        public Url FindUrlAndIncreaseNumberOfTransitionByOne(Url url)=> 
-            _urlRepo.UpdateAndReturnUrl(u=> u.IncreaseNumberOfTransitions(), url);
-        
-        public string CreateTinyUrlForUser(User user, string url)
+        public async Task<string> CreateTinyUrlForUserAsync(User user, string url)
         {
             var tinyUrl = TinyCreator.CreateTinyUrl(url);
-            var allUrls = _urlRepo.GetAllTinyPaths();
-            while (allUrls.Any(u=> u == tinyUrl))
+            var allUrls = await _urlRepo.GetAllTinyPathsAsync();
+            while (allUrls.Any(u => u == tinyUrl))
                 tinyUrl = TinyCreator.CreateTinyUrl(url);
-
             return tinyUrl;
         }
 
-        public void UpdateHistoryForUser(string tinyPath, User user)
+        public async Task UpdateHistoryForUserAsync(string tinyPath, User user)
         {
-            if (user.HistoryString!=null)
+            if (user.HistoryString != null)
                 user.HistoryString = user.HistoryString + "," + tinyPath;
-            else 
+            else
                 user.HistoryString = tinyPath;
-            _userRepo.UpdateHistory(user);
+            await _userRepo.UpdateHistoryAsync(user);
         }
 
-        public User GetUserByUrl(int urlId)
+        public async  Task<User> GetUserByUrlAsync(int urlId) =>  await _urlRepo.GetUserByUrlAsync(urlId);
+        
+        public async Task<List<Url>> GetHistoryListForUserAsync(User user)
         {
-            return _urlRepo.GetUserByUrl(urlId);
+            var userHistory = user.History;
+            var historyList = new List<Url>();
+            foreach (var tinyUrl in userHistory)
+            {
+                var url = await _urlRepo.GetFirstOrDefaultAsync(u => u.TinyPath == tinyUrl);
+                if (url == null)
+                    throw new Exception("Find null links in userHistory");
+                historyList.Add(url);
+            }
+            return historyList;
         }
-    }
+    } 
 }
+

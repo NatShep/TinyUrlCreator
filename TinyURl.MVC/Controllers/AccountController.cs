@@ -8,7 +8,6 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using TinyUrl.DAL.Models;
-using TinyUrl.DAL;
 using TinyUrl.Logic.Services;
 using TinyURl.MVC.Models.ViewModels;
 
@@ -37,7 +36,7 @@ namespace TinyURl.MVC.Controllers
         {
             if (ModelState.IsValid)
             {
-                User user = await _tinyUrlService.FindUserOrNullAsyncByCondition
+                User user = await _tinyUrlService.FindUserOrNullByConditionAsync
                     (u => u.UserName == model.Name && u.Password == model.Password);
                 if (user != null)
                 {
@@ -58,15 +57,14 @@ namespace TinyURl.MVC.Controllers
         {
             if (ModelState.IsValid)
             {
-                User user = await _tinyUrlService.FindUserOrNullAsyncByCondition(u => u.UserName == model.Name);
+                User user = await _tinyUrlService.FindUserOrNullByConditionAsync(u => u.UserName == model.Name);
                 if (user == null)
                 {
-                    _tinyUrlService.AddUser(new User { UserName = model.Name, Password = model.Password });
+                    _tinyUrlService.AddUserAsync(new User { UserName = model.Name, Password = model.Password });
                     await Authenticate(model.Name); 
                     return RedirectToAction("Index", "TinyUrl");
                 }
-                else
-                    ModelState.AddModelError("", "Имя пользователя уже существует. Выберите другое.");
+                ModelState.AddModelError("", "Имя пользователя уже существует. Выберите другое.");
             }
             return View(model);
         }

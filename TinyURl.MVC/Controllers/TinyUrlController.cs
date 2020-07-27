@@ -1,11 +1,4 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net;
-using System.Security.Claims;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using TinyUrl.DAL.Models;
@@ -19,11 +12,8 @@ namespace TinyURl.MVC.Controllers
     {
         private readonly MakeTinyUrlService _tinyUrlService;
 
-        public TinyUrlController(MakeTinyUrlService tinyUrlService)
-        {
-            _tinyUrlService = tinyUrlService;
-        }
-
+        public TinyUrlController(MakeTinyUrlService tinyUrlService) => _tinyUrlService = tinyUrlService;
+        
         [HttpGet]
         [Authorize]
         //[AllowAnonymous]
@@ -38,20 +28,20 @@ namespace TinyURl.MVC.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> CreateTinyUrl(UrlModel url)
         {
+            //Check link. Is it Working?
             var ping = KnockToUrl.Knock(url.OriginalUrl);
             Task.WaitAll(ping);
+            
+            // Link is working
             if (ping.Result)
             {
-                var user = GetUser(User.Identity.Name);
+                var user = await GetUserAsync(User.Identity.Name);
+                //check user
                 if (User.Identity.Name == "Anonimus")
-                {
-                    url.TinyPath = _tinyUrlService.CreateTinyUrlForUser(user, url.OriginalUrl);
-                    url.UrlExist = true;
                     return View(url);
-                }
-
-                var existingUrl =
-                    _tinyUrlService.FindFirsUrlOrNullByCondition(u =>
+                
+                //check url. Is it Exist?
+                var existingUrl = await _tinyUrlService.FindUrlOrNullByConditionAsync(u =>
                         u.OriginalPath == url.OriginalUrl && u.User == user);
                 if (existingUrl != null)
                 {
@@ -64,61 +54,51 @@ namespace TinyURl.MVC.Controllers
                     });
                 }
 
-                url.TinyPath = _tinyUrlService.CreateTinyUrlForUser(user, url.OriginalUrl);
+                //CreateTinyUrl
+                url.TinyPath = await _tinyUrlService.CreateTinyUrlForUserAsync(user, url.OriginalUrl);
                 url.UrlExist = true;
 
-                _tinyUrlService.AddUrl(new Url
+                //Add TinyUrl
+                await _tinyUrlService.AddUrlAsync(new Url
                 {
                     OriginalPath = url.OriginalUrl,
                     TinyPath = url.TinyPath,
                     User = user,
                 });
             }
+            //Link is not working
             else
             {
                 url.UrlExist = false;
-                ModelState.AddModelError("", "Вы ввели не рабочую ссылку");
+                ModelState.AddModelError("", "Вы ввели не рабочую ссылку либо ссылка не отвечает. Попробуйте позднее.");
             }
             return View(url);
         }
 
         [HttpGet]
         [Authorize]
-        public IActionResult History()
+        public async  Task<IActionResult> History()
         {
-            var user = GetUser(User.Identity.Name);
-            var userHistory = user.History;
-            var historyList = new List<Url>();
-            foreach (var tinyUrl in userHistory)
-            {
-                var url = _tinyUrlService.FindFirsUrlOrNullByCondition(u => u.TinyPath == tinyUrl);
-                if (url == null)
-                {
-                    throw new Exception("Find null links in userHistory");
-                }
-
-                historyList.Add(url);
-            }
-
+            var user = await GetUserAsync(User.Identity.Name);
+            var historyList = await _tinyUrlService.GetHistoryListForUserAsync(user);
             return View(historyList);
         }
 
         [HttpGet]
         [Authorize]
-        public IActionResult GetAllUrls()
+        public async Task<IActionResult> GetAllUrls()
         {
-            var user = GetUser(User.Identity.Name);
-            var userUrls = _tinyUrlService.FindUrlsByUser(user.Id);
+            var user = await GetUserAsync(User.Identity.Name);
+            var userUrls = await _tinyUrlService.FindUrlsByUserAsync(user.Id);
             return View(userUrls);
         }
 
         [Route("TinyUrl/{tinyPath}")]
         [HttpGet]
-        public IActionResult GoToTinyUrl(string tinyPath)
+        public async Task<IActionResult> GoToTinyUrl(string tinyPath)
         {
-            
             //find tiny url with this tinyPath (tinyPath is unique)
-            var url = _tinyUrlService.FindFirsUrlOrNullByCondition(u => u.TinyPath == tinyPath);
+            var url =await _tinyUrlService.FindUrlOrNullByConditionAsync(u => u.TinyPath == tinyPath);
             if (url == null)
             {
                 ModelState.AddModelError("", "Переход по несуществующей ссылке.");
@@ -126,30 +106,23 @@ namespace TinyURl.MVC.Controllers
             }
             
             //find the User(holder) of this tiny url
-            var user = _tinyUrlService.GetUserByUrl(url.Id);
+            var user = await _tinyUrlService.GetUserByUrlAsync(url.Id);
             
             //increase number of transition and history, if User or someone else use this tiny url
             //??   maybe better to update history when user(not everybody) go to url  ??
             // TODO add info(for example time) of transition
-            var tinyUrl = _tinyUrlService.FindUrlAndIncreaseNumberOfTransitionByOne(url);
-            _tinyUrlService.UpdateHistoryForUser(url.TinyPath, user);
+            var tinyUrl = await _tinyUrlService.IncreaseNumberOfTransitionByOneAsync(url);
+             await _tinyUrlService.UpdateHistoryForUserAsync(url.TinyPath, user);
 
             return new RedirectResult(tinyUrl.OriginalPath);
         }
-
-        private User GetUser(string name)
+        private async Task<User> GetUserAsync(string name)
         {
-            var user = _tinyUrlService.FindUserOrNullByCondition(u =>
+            var user = await _tinyUrlService.FindUserOrNullByConditionAsync(u =>
                 u.UserName == name);
             if (user == null)
-                return new User
-                {
-                    UserName = "Анонимный пользователь"
-                };
+                return new User {UserName = "Anonymous"};
             return user;
         }
-        
-        
-
     }
 }

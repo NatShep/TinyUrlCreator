@@ -9,40 +9,44 @@ using TinyUrl.DAL.Models;
 
 namespace TinyUrl.DAL.Repo
 {
-    public class UserRepo
+    public class UserRepo: IRepo<User>
     {
         private readonly TinyUrlContext _db;
 
         public UserRepo() : this(new TinyUrlContext())
         {  }
-        public UserRepo(TinyUrlContext context)
-        {
-            _db = context;
+        public UserRepo(TinyUrlContext context) => _db = context;
             
-        }
-
-        public void AddUser(User user)
+        public async Task<int> AddAsync(User user)
         {
-            _db.Users.Add(user);
-            _db.SaveChanges();
+            await _db.Users.AddAsync(user);
+            await SaveChangesAsync();
+            return user.Id;
         }
 
-        public User GetOne(in int id) => _db.Users.Find(id);
+        public User GetOne(int id) => _db.Users.Find(id);
 
-        public Task<User> GetFirstOrDefaultAsync(Expression<Func<User, bool>> where) => _db.Users.FirstOrDefaultAsync(where);
+        public async Task<User> GetOneAsync(int id) => await _db.Users.FindAsync(id);
         
         public User GetFirstOrDefault(Expression<Func<User, bool>> where) => _db.Users.FirstOrDefault(where);
 
-        public List<User> GetSome(Expression<Func<User, bool>> where) => _db.Users.Where(where).ToList();
+        public async Task<User> GetFirstOrDefaultAsync(Expression<Func<User, bool>> where) => 
+            await  _db.Users.FirstOrDefaultAsync(where);
+
+        public List<User> GetSome(Expression<Func<User, bool>> where) =>
+            _db.Users.Where(where).ToList();
+
+        public async Task<List<User>> GetSomeAsync(Expression<Func<User, bool>> where) => 
+            await _db.Users.Where(where).ToListAsync();
 
 
-        public void UpdateHistory(User user) => SaveChanges();
+        public async Task UpdateHistoryAsync(User user) =>await SaveChangesAsync();
         
-        private int SaveChanges()
+        private async  Task<int> SaveChangesAsync()
         {
             try
             {
-                return _db.SaveChanges();
+                return await  _db.SaveChangesAsync();
             }
             catch (DbUpdateConcurrencyException e)
             {
