@@ -29,6 +29,7 @@ namespace TinyURl.MVC.Controllers
         public async Task<IActionResult> CreateTinyUrl(UrlModel url)
         {
             //Check link. Is it Working?
+            url.OriginalUrl = UrlReader.ReadUrl(url.OriginalUrl);
             var ping = KnockToUrl.Knock(url.OriginalUrl);
             Task.WaitAll(ping);
             

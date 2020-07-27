@@ -9,9 +9,10 @@ namespace TinyUrl.EF.DataInitializer
         {
             context.Database.EnsureDeleted();
             context.Database.Migrate();
-           //      context.SaveChanges();
         }
-
+        
+        public static void Migrate(TinyUrlContext context) => context.Database.Migrate();
+        
         public static void ClearData(TinyUrlContext context)
         {
             ExecuteDeleteSql(context, "Users");
