@@ -7,15 +7,10 @@ namespace TinyUrl.DAL
     {
         public TinyUrlContext(DbContextOptions options)
             : base(options)
-        {
-            Database.EnsureCreated();
-
-        }
+        { }
 
         public TinyUrlContext()
-        {
-
-        }
+        { }
         public DbSet<User> Users { get; set; }
         public DbSet<Url> Urls { get; set; }
         
